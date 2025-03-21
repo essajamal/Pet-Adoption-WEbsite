@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Adoption Questionnaire</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+          <h1> 🐾 PawQuest</h1>
+        </div>
+        <nav>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="qs.html">Find Your Perfect Pet</a></li>
+          </ul>
+        </nav>
+    </header>
+    <main>
+        <div id="questionnaire">
+            <p id="question-text"></p>
+            <div id="options"></div>
+            <button id="next-button" onclick="nextQuestion()" style="display: none;">Next</button>
+        </div>
+        <div id="recommendation"></div>
+    </main>
+    <script>
+        let questions = [
+            { text: "Do you have any children under the age of 8?", type: "button", key: "children", options: ["Yes", "No"] },
+            { text: "What is your budget range for pet care (including food, vet bills, etc.)?", type: "select", key: "budget", options: ["Under £50/month", "£50-£150/month", "Over £150/month"] },
+            { text: "Are you able to take the pet on regular walks or provide daily exercise?", type: "button", key: "exercise", options: ["Yes", "No"] },
+            { text: "Have you owned pets before?", type: "button", key: "experience", options: ["Yes", "No"] },
+            { text: "Would you prefer a pet that is already trained, or would you like to train the pet yourself?", type: "select", key: "training", options: ["Already trained", "I will train the pet"] },
+            { text: "Are you comfortable adopting a pet that has been previously mistreated and may require extra care and patience?", type: "button", key: "mistreated", options: ["Yes", "No"] },
+            { text: "Would you prefer a younger pet or a senior pet?", type: "select", key: "age", options: ["Younger pet", "Senior pet", "No preference"] },
+            { text: "Would you consider adopting a pet with a medical condition or disability?", type: "button", key: "medical", options: ["Yes", "No"] }
+        ];
+
+        let currentQuestionIndex = 0;
+        let answers = {};
+
+        function displayQuestion() {
+            let questionContainer = document.getElementById("question-text");
+            let optionsContainer = document.getElementById("options");
+            let nextButton = document.getElementById("next-button");
+            
+            questionContainer.textContent = questions[currentQuestionIndex].text;
+            optionsContainer.innerHTML = "";
+            
+            if (questions[currentQuestionIndex].type === "button") {
+                questions[currentQuestionIndex].options.forEach(option => {
+                    let button = document.createElement("button");
+                    button.textContent = option;
+                    button.onclick = function() {
+                        answers[questions[currentQuestionIndex].key] = option;
+                        nextButton.style.display = "block";
+                    };
+                    optionsContainer.appendChild(button);
+                });
+            } else if (questions[currentQuestionIndex].type === "select") {
+                let select = document.createElement("select");
+                questions[currentQuestionIndex].options.forEach(option => {
+                    let optionElement = document.createElement("option");
+                    optionElement.textContent = option;
+                    optionElement.value = option;
+                    select.appendChild(optionElement);
+                });
+                select.onchange = function() {
+                    answers[questions[currentQuestionIndex].key] = select.value;
+                    nextButton.style.display = "block";
+                };
+                optionsContainer.appendChild(select);
+            }
+            nextButton.style.display = "none";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+            } else {
+                recommendPet();
+            }
+        }
+
+        function recommendPet() {
+            let recommendedPet = "";
+            if (answers.children === "Yes" && answers.mistreated !== "Yes" && answers.exercise === "Yes") {
+                recommendedPet = "Dog";
+            } else if (answers.exercise === "No" && answers.budget === "Under £50/month") {
+                recommendedPet = "Guinea Pig or Rabbit";
+            } else if (answers.medical === "Yes") {
+                recommendedPet = "Cat or Turtle";
+            } else if (answers.age === "Senior pet") {
+                recommendedPet = "Older Cat or Dog";
+            } else {
+                recommendedPet = "Bird or Fowl";
+            }
+
+            document.getElementById("questionnaire").style.display = "none";
+            document.getElementById("recommendation").innerHTML = `<h2>Your recommended pet is: ${recommendedPet}</h2>`;
+        }
+
+        window.onload = displayQuestion;
+    </script>
+</body>
+</html>
+    <footer>
+        <p id="footer">Innovation Initiative</p>
+    </footer>
